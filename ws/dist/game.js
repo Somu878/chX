@@ -13,13 +13,13 @@ class Game {
         this.player1.send(JSON.stringify({
             type: messages_1.INIT_GAME,
             payload: {
-                color: "White",
+                color: "white",
             },
         }));
         this.player2.send(JSON.stringify({
             type: messages_1.INIT_GAME,
             payload: {
-                color: "Black",
+                color: "black",
             },
         }));
     }
@@ -39,7 +39,16 @@ class Game {
             type: messages_1.MOVE,
             payload: move,
         });
+        this.player1.send(movePayload);
+        this.player2.send(movePayload);
+        if (this.board.inCheck()) {
+            console.log("CHeck mate");
+        }
+        if (this.board.isCheckmate()) {
+            console.log("Hoho checkmate!");
+        }
         if (this.board.isGameOver()) {
+            console.log("Game over");
             const winner = this.board.turn() === "w" ? "black" : "white";
             const gameOverPayload = JSON.stringify({
                 type: messages_1.GAME_OVER,
@@ -49,13 +58,6 @@ class Game {
             });
             this.player1.send(gameOverPayload);
             this.player2.send(gameOverPayload);
-            return;
-        }
-        if (socket === this.player1) {
-            this.player2.send(movePayload);
-        }
-        else {
-            this.player1.send(movePayload);
         }
     }
 }

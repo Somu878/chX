@@ -58,7 +58,14 @@ function ChessBoard({ board, socket, setBoard, chess }: BoardProps) {
               >
                 <div className="flex justify-center w-full h-full">
                   <div className="flex flex-col justify-center h-full">
-                    {s ? s.type : ""}
+                    {s ? (
+                      <img
+                        className="w-14"
+                        src={`/${
+                          s?.color === "b" ? `b${s.type}` : `w${s.type}`
+                        }.png`}
+                      />
+                    ) : null}
                   </div>
                 </div>
               </div>
