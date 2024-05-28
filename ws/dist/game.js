@@ -39,8 +39,6 @@ class Game {
             type: messages_1.MOVE,
             payload: move,
         });
-        console.log("Move made:", move);
-        console.log("Current board state:", this.board.fen());
         if (this.board.isGameOver()) {
             const winner = this.board.turn() === "w" ? "black" : "white";
             const gameOverPayload = JSON.stringify({
