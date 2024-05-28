@@ -35,28 +35,40 @@ export class Game {
 
   handleMove(socket: WebSocket, move: { from: string; to: string }) {
     try {
-      this.board.move(move);
+      const result = this.board.move(move);
+      if (!result) {
+        throw new Error("Invalid move");
+      }
     } catch (error) {
+      console.log("Error making move:", error);
       return;
     }
+
+    this.moves.push(`${move.from}-${move.to}`);
+
+    const movePayload = JSON.stringify({
+      type: MOVE,
+      payload: move,
+    });
+
     if (this.board.isGameOver()) {
-      this.player1.emit(
-        JSON.stringify({
-          type: GAME_OVER,
-          payload: {
-            winner: this.board.turn() === "w" ? "black" : "White",
-          },
-        })
-      );
+      const winner = this.board.turn() === "w" ? "black" : "white";
+      const gameOverPayload = JSON.stringify({
+        type: GAME_OVER,
+        payload: {
+          winner,
+        },
+      });
+
+      this.player1.send(gameOverPayload);
+      this.player2.send(gameOverPayload);
       return;
     }
-    if (this.board.moves.length % 2 == 0) {
-      this.player2.emit(
-        JSON.stringify({
-          type: MOVE,
-          payload: move,
-        })
-      );
+
+    if (socket === this.player1) {
+      this.player2.send(movePayload);
+    } else {
+      this.player1.send(movePayload);
     }
   }
 }

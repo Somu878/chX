@@ -28,7 +28,6 @@ class GameManager {
                 }
                 else {
                     this.pendingUser = socket;
-                    console.log("In pending mode");
                 }
             }
             if (message.type === messages_1.MOVE) {

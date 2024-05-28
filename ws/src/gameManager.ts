@@ -34,7 +34,6 @@ export class GameManager {
           this.games.push(game);
         } else {
           this.pendingUser = socket;
-          console.log("In pending mode");
         }
       }
       if (message.type === MOVE) {

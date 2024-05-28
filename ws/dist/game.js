@@ -25,25 +25,39 @@ class Game {
     }
     handleMove(socket, move) {
         try {
-            this.board.move(move);
+            const result = this.board.move(move);
+            if (!result) {
+                throw new Error("Invalid move");
+            }
         }
         catch (error) {
+            console.log("Error making move:", error);
             return;
         }
+        this.moves.push(`${move.from}-${move.to}`);
+        const movePayload = JSON.stringify({
+            type: messages_1.MOVE,
+            payload: move,
+        });
+        console.log("Move made:", move);
+        console.log("Current board state:", this.board.fen());
         if (this.board.isGameOver()) {
-            this.player1.emit(JSON.stringify({
+            const winner = this.board.turn() === "w" ? "black" : "white";
+            const gameOverPayload = JSON.stringify({
                 type: messages_1.GAME_OVER,
                 payload: {
-                    winner: this.board.turn() === "w" ? "black" : "White",
+                    winner,
                 },
-            }));
+            });
+            this.player1.send(gameOverPayload);
+            this.player2.send(gameOverPayload);
             return;
         }
-        if (this.board.moves.length % 2 == 0) {
-            this.player2.emit(JSON.stringify({
-                type: messages_1.MOVE,
-                payload: move,
-            }));
+        if (socket === this.player1) {
+            this.player2.send(movePayload);
+        }
+        else {
+            this.player1.send(movePayload);
         }
     }
 }
